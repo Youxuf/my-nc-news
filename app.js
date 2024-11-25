@@ -1,15 +1,18 @@
 const express = require("express");
-const { getApi, getTopics } = require("./nc_controllers/app.controller");
+const { getApi, getTopics, getArticles } = require("./nc_controllers/app.controller");
 const {
   psqlErrorHandler,
   customErrorHandler,
-} = require("./nc models/error-handler");
+} = require("./error-handler");
 
 const app = express();
 
 app.get("/api", getApi);
 
 app.get("/api/topics", getTopics);
+
+app.get("/api/articles/:article_id", getArticles)
+
 app.all("*", (req, res) => {
   res.status(404).send({ message: "not found" });
 });
