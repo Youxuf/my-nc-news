@@ -1,6 +1,6 @@
 # Northcoders News API
 
- In order to successfully connect to the two databases locally. PGDATABASE=nc_news was added to .env.development and PGDATABASE=nc_news was added to .env.test.
+ In order to successfully connect to the two databases locally. PGDATABASE=nc_news was added to the development environment and PGDATABASE=nc_news was added to test environment.
 
 
 
