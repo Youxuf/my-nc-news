@@ -63,3 +63,20 @@ exports.insertComment = ({username, body, article_id}) => {
     return rows[0];
   })
 }
+
+exports.updateArticleVotes = ({article_id, inc_votes}) => {
+  if (typeof inc_votes !== "number") {
+    return Promise.reject({status:400, msg:"Invalid input"});
+}
+  const sqlQuery = `
+      UPDATE articles
+      SET votes = votes + $1
+      WHERE article_id = $2
+      RETURNING * ;
+  `;
+  const values = [inc_votes, article_id];
+
+  return db.query(sqlQuery, values).then(({ rows }) => {
+      return rows[0];
+  });
+};

@@ -49,33 +49,70 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET /api/articles/:article_id", () => {
-  test("200: returns a single article with the required properties", () => {
-    return request(app)
-      .get("/api/articles/1")
-      .expect(200)
-      .then(({ body }) => {
-        const { article } = body;
-        expect(article).toMatchObject({
-          author: expect.any(String),
-          title: expect.any(String),
-          article_id: expect.any(Number),
-          body: expect.any(String),
-          topic: expect.any(String),
-          created_at: expect.any(String),
-          votes: expect.any(Number),
-          article_img_url: expect.any(String),
+describe("/api/articles/:article_id", () => {
+  describe("GET", () => {
+    test("200: returns a single article with the required properties", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
         });
-      });
-  });
+    });
 
-  test("GET:400 sends an appropriate status and error message when given an invalid id", () => {
-    return request(app)
-      .get("/api/articles/article")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body).toEqual({ message: "Bad request" });
-      });
+    test("400: sends an appropriate status and error message when given an invalid id", () => {
+      return request(app)
+        .get("/api/articles/article")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ message: "Bad request" });
+        });
+    });
+  });
+  describe("PATCH", () => {
+    test("200: increments the articles votes by the specified amount", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            votes: 101,
+          });
+        });
+    });
+    test("200: decrements the articles votes by the specified amount", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            votes: 90,
+          });
+        });
+    });
+    test("400: responds with an appropriate status and error message when provided with a invalid input for votes", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "not" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ message: "Invalid input" });
+        });
+    });
   });
 });
 
@@ -181,24 +218,23 @@ describe("/api/articles/:article_id/comments", () => {
             author: "butter_bridge",
             body: "what a wonderful day",
             article_id: 1,
-            votes: 0, 
+            votes: 0,
             created_at: expect.any(String),
             comment_id: expect.any(Number),
-                });
           });
         });
-    
-  
-  test('400 responds with an appropriate status and error message when provided with a no comment', () => {
-    return request(app)
-      .post('/api/articles/1/comments')
-      .send({
-        username: "butter_bridge"
-      })
-      .expect(400)
-      .then(({body}) => {
-        expect(body).toEqual({message:"Bad request"});
-      });
+    });
+
+    test("400: responds with an appropriate status and error message when provided with a no comment", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+          username: "butter_bridge",
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ message: "Bad request" });
+        });
+    });
   });
 });
-})
