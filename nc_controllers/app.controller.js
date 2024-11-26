@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { allTopics, allArticles } = require("../nc models/app.model");
+const { allTopics, allArticles, singleArticle } = require("../nc models/app.model");
 
 exports.getApi = (req, res) => {
   res.status(200).send({ endpoints: endpointsJson });
@@ -15,9 +15,16 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { article_id } = req.params;
-  allArticles(article_id)
+  singleArticle(article_id)
     .then((article) => {
       res.status(200).send({ article });
     })
     .catch(next);
+};
+
+exports.getAllArticles = (req, res, next) => {
+  allArticles().then((articles) => {
+    res.status(200).send({articles});
+  })
+  .catch(next)
 };

@@ -55,8 +55,8 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        const articles = body.article;
-        expect(articles).toMatchObject({
+        const { article } = body;
+        expect(article).toMatchObject({
           author: expect.any(String),
           title: expect.any(String),
           article_id: expect.any(Number),
@@ -75,6 +75,41 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body).toEqual({ message: "Bad request" });
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: returns all the articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            comment_count: expect.any(String),
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+      });
+  });
+  test("404: responds with a 'not found' message", () => {
+    return request(app)
+      .get("/api/route")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "not found" });
       });
   });
 });
