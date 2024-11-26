@@ -114,53 +114,91 @@ describe("GET /api/articles", () => {
   });
 });
 
-describe("GET /api/articles/:article_id/comments", () => {
-  test("200: responds with an array of comments for the given article_id with the required properties", () => {
-    return request(app)
-      .get("/api/articles/1/comments")
-      .expect(200)
-      .then(({ body }) => {
-        const comments = body.comments;
-        expect(Array.isArray(comments)).toBe(true);
-        expect(comments).toHaveLength(11);
-        expect(comments).toBeSortedBy("created_at", { descending: true });
+describe("/api/articles/:article_id/comments", () => {
+  describe("GET", () => {
+    test("200: responds with an array of comments for the given article_id with the required properties", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const comments = body.comments;
+          expect(Array.isArray(comments)).toBe(true);
+          expect(comments).toHaveLength(11);
+          expect(comments).toBeSortedBy("created_at", { descending: true });
 
-        comments.forEach((comment) => {
-          expect(comment).toMatchObject({
-            author: expect.any(String),
-            comment_id: expect.any(Number),
-            article_id: 1,
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            body: expect.any(String),
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              author: expect.any(String),
+              comment_id: expect.any(Number),
+              article_id: 1,
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              body: expect.any(String),
+            });
           });
         });
-      });
-  });
+    });
 
-  test("200: responds with an empty array ", () => {
-    return request(app)
-      .get("/api/articles/2/comments")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.comments).toEqual([]);
-      });
-  });
-  test("404: responds with 'not found' for valid but non-existent article_id", () => {
-    return request(app)
-      .get("/api/articles/66/comments")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body).toEqual({ message: "not found" });
-      });
-  });
+    test("200: responds with an empty array ", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).toEqual([]);
+        });
+    });
+    test("404: responds with 'not found' for valid but non-existent article_id", () => {
+      return request(app)
+        .get("/api/articles/66/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({ message: "not found" });
+        });
+    });
 
-  test("400: responds with 'Bad request' when article_id is invalid", () => {
+    test("400: responds with 'Bad request' when article_id is invalid", () => {
+      return request(app)
+        .get("/api/articles/route/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({ message: "Bad request" });
+        });
+    });
+  });
+  describe("POST", () => {
+    test("201: responds with the posted comment", () => {
+      const newComment = {
+        username: "butter_bridge",
+        body: "what a wonderful day",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const comment = body.comment;
+          expect(comment).toMatchObject({
+            author: "butter_bridge",
+            body: "what a wonderful day",
+            article_id: 1,
+            votes: 0, 
+            created_at: expect.any(String),
+            comment_id: expect.any(Number),
+                });
+          });
+        });
+    
+  
+  test('400 responds with an appropriate status and error message when provided with a no comment', () => {
     return request(app)
-      .get("/api/articles/route/comments")
+      .post('/api/articles/1/comments')
+      .send({
+        username: "butter_bridge"
+      })
       .expect(400)
-      .then(({ body }) => {
-        expect(body).toEqual({ message: "Bad request" });
+      .then(({body}) => {
+        expect(body).toEqual({message:"Bad request"});
       });
   });
 });
+})

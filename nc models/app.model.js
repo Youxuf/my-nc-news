@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { values } = require("../db/data/test-data/articles");
 
 exports.allTopics = () => {
   let sqlQuery = `SELECT * FROM topics `;
@@ -48,3 +49,17 @@ exports.allComments = (article_id) => {
       return rows;
     });
 };
+
+exports.insertComment = ({username, body, article_id}) => {
+  if (!username || !body) {
+    return Promise.reject({status:400, msg:"Bad request"});
+  }
+
+  const author = username;
+  let sqlQuery = `INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING * ; `;
+  const values = [author, body, article_id];
+
+  return db.query(sqlQuery, values).then(({ rows }) => {
+    return rows[0];
+  })
+}
