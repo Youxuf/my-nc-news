@@ -7,8 +7,10 @@ exports.psqlErrorHandler = (err, request, response, next) => {
 };
 
 exports.customErrorHandler = (err, req, res, next) => {
-  if (err.status && err.message) {
-    res.status(err.status).send({message:err.msg});
+  console.log("Custom Error Handler Response:", err);
+
+  if (err.status && err.msg) {
+    res.status(err.status).send({ message: err.msg });
   } else {
     next(err);
   }
