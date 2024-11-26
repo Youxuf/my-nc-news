@@ -4,6 +4,7 @@ const {
   allArticles,
   singleArticle,
   allComments,
+  insertComment,
 } = require("../nc models/app.model");
 const { checkArticleExists } = require("./check");
 
@@ -47,6 +48,19 @@ exports.getComments = (req, res, next) => {
   Promise.all(promises)
     .then(([comments]) => {
       res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+  const { username, body } = req.body;
+  const { article_id } = req.params;
+  const newComment = { username, body, article_id };
+
+  checkArticleExists(article_id)
+    .then(() => insertComment(newComment))
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch(next);
 };
