@@ -5,6 +5,7 @@ const {
   singleArticle,
   allComments,
   insertComment,
+  updateArticleVotes,
 } = require("../nc models/app.model");
 const { checkArticleExists } = require("./check");
 
@@ -61,6 +62,18 @@ exports.postComment = (req, res, next) => {
     .then(() => insertComment(newComment))
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.patchArticleVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  const votes = { article_id, inc_votes };
+
+  updateArticleVotes(votes)
+    .then((updatedArticle) => {
+      res.status(200).send({ article: updatedArticle });
     })
     .catch(next);
 };
