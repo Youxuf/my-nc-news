@@ -1,5 +1,5 @@
 const express = require("express");
-const { getApi, getTopics, getArticles, getAllArticles, getComments, postComment } = require("./nc_controllers/app.controller");
+const { getApi, getTopics, getArticles, getAllArticles, getComments, postComment, patchArticleVotes } = require("./nc_controllers/app.controller");
 const {
   psqlErrorHandler,
   customErrorHandler,
@@ -20,6 +20,8 @@ app.get("/api/articles/:article_id/comments", getComments)
 app.use(express.json())
 
 app.post("/api/articles/:article_id/comments", postComment)
+
+app.patch("/api/articles/:article_id", patchArticleVotes)
 
 app.all("*", (req, res) => {
   res.status(404).send({ message: "not found" });
