@@ -33,7 +33,8 @@ exports.getArticles = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  allArticles()
+  const{sort_by, order} = req.query
+  allArticles(sort_by, order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -91,6 +92,6 @@ exports.deleteComment = (req, res, next) => {
 
 exports.getUsers = (req, res, next) => {
   selectUsers().then((users) => {
-    res.status(200).send(users)
+    res.status(200).send({users})
   }).catch(next)
 };
