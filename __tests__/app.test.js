@@ -110,7 +110,7 @@ describe("/api/articles/:article_id", () => {
         .send({ inc_votes: "not" })
         .expect(400)
         .then(({ body }) => {
-          expect(body).toEqual({ message: "Invalid input" });
+          expect(body).toEqual({ message: "Bad request" });
         });
     });
   });
@@ -236,5 +236,27 @@ describe("/api/articles/:article_id/comments", () => {
           expect(body).toEqual({ message: "Bad request" });
         });
     });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id,", () => {
+  test("204: deletes the comment and send no body back", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("DELETE:404 responds with an appropriate status and error message when given a non-existent id", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "comment does not exist" });
+      });
+  });
+  test("DELETE:400 responds with an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/not-a-comment")
+      .expect(400)
+      .then(({body}) => {
+        expect(body).toEqual({message:"Bad request"});
+      });
   });
 });

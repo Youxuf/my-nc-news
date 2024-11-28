@@ -50,9 +50,9 @@ exports.allComments = (article_id) => {
     });
 };
 
-exports.insertComment = ({username, body, article_id}) => {
+exports.insertComment = ({ username, body, article_id }) => {
   if (!username || !body) {
-    return Promise.reject({status:400, msg:"Bad request"});
+    return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
   const author = username;
@@ -61,13 +61,10 @@ exports.insertComment = ({username, body, article_id}) => {
 
   return db.query(sqlQuery, values).then(({ rows }) => {
     return rows[0];
-  })
-}
+  });
+};
 
-exports.updateArticleVotes = ({article_id, inc_votes}) => {
-  if (typeof inc_votes !== "number") {
-    return Promise.reject({status:400, msg:"Invalid input"});
-}
+exports.updateArticleVotes = ({ article_id, inc_votes }) => {
   const sqlQuery = `
       UPDATE articles
       SET votes = votes + $1
@@ -77,6 +74,16 @@ exports.updateArticleVotes = ({article_id, inc_votes}) => {
   const values = [inc_votes, article_id];
 
   return db.query(sqlQuery, values).then(({ rows }) => {
-      return rows[0];
+    return rows[0];
+  });
+};
+
+exports.removeComment = (comment_id) => {
+  const sqlQuery = `DELETE FROM comments WHERE comment_id = $1 RETURNING * `;
+  const values = [comment_id];
+  return db.query(sqlQuery, values).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "comment does not exist" });
+    }
   });
 };
