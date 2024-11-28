@@ -141,6 +141,30 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("200: sorts articles by votes in ascending order when specified", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("votes", { ascending: true });
+      });
+  });
+  test("400: responds with 'Invalid sort_by column' for invalid sort_by", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid_column")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "Invalid sort_by column" });
+      });
+  });
+  test("400: responds with 'Invalid order query' for invalid order value", () => {
+    return request(app)
+      .get("/api/articles?order=invalid_order")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "Invalid order query" });
+      });
+  });
   test("404: responds with a 'not found' message", () => {
     return request(app)
       .get("/api/route")
@@ -255,8 +279,8 @@ describe("DELETE /api/comments/:comment_id,", () => {
     return request(app)
       .delete("/api/comments/not-a-comment")
       .expect(400)
-      .then(({body}) => {
-        expect(body).toEqual({message:"Bad request"});
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "Bad request" });
       });
   });
 });
@@ -267,22 +291,16 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((users) => {
-          expect(body).toHaveLength(4);
-          expect(users).toMatchObject({
+        const { users } = body;
+        expect(Array.isArray(users)).toBe(true);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
             username: expect.any(String),
-            name:expect.any(String),
+            name: expect.any(String),
             avatar_url: expect.any(String),
           });
         });
-      });
-  });
-  test("404: responds with a 'not found' message", () => {
-    return request(app)
-      .get("/api/not-users")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body).toEqual({ message: "not found" });
       });
   });
 });
