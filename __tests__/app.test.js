@@ -261,7 +261,7 @@ describe("DELETE /api/comments/:comment_id,", () => {
   });
 });
 
-describe.only("GET /api/users", () => {
+describe("GET /api/users", () => {
   test("200: returns all the users with the desired categories", () => {
     return request(app)
       .get("/api/users")
