@@ -87,3 +87,10 @@ exports.removeComment = (comment_id) => {
     }
   });
 };
+
+exports.selectUsers = () => {
+  let sqlQuery = `SELECT * FROM users `;
+  return db.query(sqlQuery).then(({ rows }) => {
+    return rows;
+  });
+};

@@ -260,3 +260,29 @@ describe("DELETE /api/comments/:comment_id,", () => {
       });
   });
 });
+
+describe.only("GET /api/users", () => {
+  test("200: returns all the users with the desired categories", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        body.forEach((users) => {
+          expect(body).toHaveLength(4);
+          expect(users).toMatchObject({
+            username: expect.any(String),
+            name:expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+  test("404: responds with a 'not found' message", () => {
+    return request(app)
+      .get("/api/not-users")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "not found" });
+      });
+  });
+});
