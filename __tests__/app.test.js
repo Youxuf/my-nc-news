@@ -149,6 +149,24 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSortedBy("votes", { ascending: true });
       });
   });
+  test("200: filters articles by topic when topic query is provided", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+  test("404: responds with 'topic not found' for non-existent topic", () => {
+    return request(app)
+      .get("/api/articles?topic=nonexistent")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ message: "topic not found" });
+      });
+  });
   test("400: responds with 'Invalid sort_by column' for invalid sort_by", () => {
     return request(app)
       .get("/api/articles?sort_by=invalid_column")
