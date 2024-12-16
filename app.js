@@ -13,9 +13,9 @@ const {
 } = require("./nc_controllers/app.controller");
 const { psqlErrorHandler, customErrorHandler } = require("./error-handler");
 
-app.use(cors());
-
 const app = express();
+
+app.use(cors());
 
 app.get("/api", getApi);
 
