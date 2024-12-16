@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const {
   getApi,
   getTopics,
@@ -11,6 +12,8 @@ const {
   getUsers,
 } = require("./nc_controllers/app.controller");
 const { psqlErrorHandler, customErrorHandler } = require("./error-handler");
+
+app.use(cors());
 
 const app = express();
 
